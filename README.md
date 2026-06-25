@@ -1,37 +1,448 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KeebForge Order Management & Tracking System
 
-## Getting Started
+<p align="center">
+  <img src="https://keebforge.in/assets/logo.png" width="180" alt="KeebForge">
+</p>
 
-First, run the development server:
+<p align="center">
+Internal Order Management Dashboard & Public Order Tracking System for KeebForge
+</p>
+
+---
+
+## Overview
+
+The KeebForge Order Management System is a full-stack web application built to manage custom mechanical keyboard orders from start to finish.
+
+It consists of two major parts:
+
+### Admin Dashboard
+
+Internal dashboard used by KeebForge staff to:
+
+- Create customer orders
+- Update build progress
+- Manage production workflow
+- Update shipping details
+- Track warranty status
+- Maintain customer records
+- Record timeline updates
+
+### Public Tracking Page
+
+Customers receive an order number (example: `KF000001`) and can track the progress of their build without creating an account.
+
+Example:
+
+```
+https://order.keebforge.in/track/KF000001
+```
+
+---
+
+# Current Features
+
+## Admin Dashboard
+
+- Dashboard overview
+- Create new order
+- Edit existing order
+- Update customer information
+- Update build information
+- Update shipping information
+- Update warranty
+- Update order status
+- Timeline system
+- Soft delete (Archive)
+- Dashboard statistics
+
+---
+
+## Public Tracking
+
+- Track using Order Number
+- Live status
+- Timeline history
+- Shipping information
+- Warranty status
+
+---
+
+# Technology Stack
+
+## Frontend
+
+- Next.js 16
+- React
+- TypeScript
+- Tailwind CSS
+
+---
+
+## Backend
+
+- Next.js Route Handlers
+- Supabase
+
+---
+
+## Database
+
+- PostgreSQL
+- Supabase
+
+---
+
+## Authentication
+
+- Supabase Auth (Admin Only)
+
+---
+
+## Hosting
+
+Frontend
+
+- Vercel
+
+Database
+
+- Supabase
+
+---
+
+# Project Structure
+
+```
+track-keebforge/
+│
+├── middleware.ts
+├── package.json
+├── README.md
+│
+├── src/
+│
+│   ├── app/
+│   │
+│   ├── admin/
+│   │
+│   │   ├── page.tsx
+│   │   ├── new/
+│   │   └── orders/
+│   │       └── [orderNumber]
+│   │
+│   ├── api/
+│   │
+│   ├── login/
+│   │
+│   ├── track/
+│   │
+│   ├── layout.tsx
+│   └── globals.css
+│
+│
+├── components/
+│
+├── lib/
+│   ├── supabase.ts
+│   ├── supabaseAdmin.ts
+│   └── auth/
+│
+└── types/
+```
+
+---
+
+# Database Schema
+
+## orders
+
+| Column | Type |
+|----------|------|
+| id | uuid |
+| order_number | varchar(8) |
+| customer_name | text |
+| customer_email | text |
+| customer_phone | text |
+| discord_username | text |
+| service_type | text |
+| current_status | text |
+| order_summary | text |
+| estimated_total | numeric |
+| keyboard_pcb_model | text |
+| switch_details | text |
+| street_address | text |
+| city | text |
+| state | text |
+| pincode | text |
+| courier | text |
+| tracking_number | text |
+| estimated_delivery | date |
+| warranty_start_date | date |
+| warranty_end_date | date |
+| notes | text |
+| is_deleted | boolean |
+| created_at | timestamptz |
+| updated_at | timestamptz |
+
+---
+
+## order_updates
+
+| Column | Type |
+|----------|------|
+| id | uuid |
+| order_id | uuid |
+| status | text |
+| note | text |
+| created_at | timestamptz |
+
+---
+
+# Order Lifecycle
+
+```
+Order Received
+        │
+Payment Pending
+        │
+Payment Received
+        │
+Parts Booked
+        │
+Parts Received
+        │
+In Queue
+        │
+Work Started
+        │
+Testing
+        │
+Packing
+        │
+Shipment Booked
+        │
+Shipment Picked Up
+        │
+Shipping
+        │
+Delivered
+        │
+Warranty Active
+        │
+Warranty Closed
+```
+
+---
+
+# API Routes
+
+## Orders
+
+### Create Order
+
+```
+POST /api/orders
+```
+
+---
+
+### Update Order
+
+```
+PATCH /api/orders/:id
+```
+
+---
+
+### Archive Order
+
+```
+DELETE /api/orders/:id
+```
+
+Soft delete only.
+
+Updates
+
+```
+is_deleted = true
+```
+
+---
+
+# Admin Routes
+
+```
+/admin
+```
+
+Dashboard
+
+```
+/admin/new
+```
+
+Create Order
+
+```
+/admin/orders/:orderNumber
+```
+
+Edit Order
+
+---
+
+# Public Routes
+
+```
+/
+```
+
+Landing Page
+
+```
+/track/:orderNumber
+```
+
+Track Order
+
+---
+
+# Authentication
+
+Only administrators can access:
+
+```
+/admin/*
+```
+
+Authentication is powered by:
+
+- Supabase Auth
+
+Customers never require an account.
+
+---
+
+# Soft Delete
+
+Orders are never permanently deleted.
+
+Instead:
+
+```
+is_deleted = true
+```
+
+Archived orders:
+
+- disappear from dashboard
+- disappear from tracking page
+- remain inside database
+
+---
+
+# Development
+
+Clone repository
+
+```bash
+git clone https://github.com/shadow269/track.keebforge.in.git
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Run development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+NEXT_PUBLIC_SUPABASE_URL=
 
-## Learn More
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
-To learn more about Next.js, take a look at the following resources:
+SUPABASE_SERVICE_ROLE_KEY=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Future Features
 
-## Deploy on Vercel
+## Customer
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Email notifications
+- SMS notifications
+- Live shipment tracking
+- Build gallery
+- Invoice download
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# track.keebforge.in
+---
+
+## Admin
+
+- Dashboard analytics
+- Search
+- Filters
+- Bulk updates
+- Restore archived orders
+- PDF invoice
+- Photo uploads
+- Timeline editor
+- Admin roles
+- Activity logs
+- Automatic status emails
+
+---
+
+# Deployment
+
+Frontend
+
+- Vercel
+
+Database
+
+- Supabase
+
+Domain
+
+```
+order.keebforge.in
+```
+
+Public tracking
+
+```
+order.keebforge.in/track/KF000001
+```
+
+---
+
+# License
+
+Private Project
+
+Copyright © KeebForge.
+
+All rights reserved.
+
+---
+
+# Author
+
+Shadow269
+
+KeebForge
+
+https://keebforge.in

@@ -16,7 +16,8 @@ export default async function OrderPage({
   const { data: order, error } = await supabase
     .from("orders")
     .select("*")
-    .eq("order_number", orderNumber.toUpperCase())
+    .eq("order_number", orderNumber)
+    .eq("is_deleted", false)
     .single();
 
   return (
@@ -41,7 +42,7 @@ export default async function OrderPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          
+
           {/* LEFT PANEL: Order Identity card & Progression Line */}
           <div className="lg:col-span-2 space-y-6">
             <div className="rounded-[24px] border border-[var(--bdr)] bg-[var(--surf)] shadow-2xl overflow-hidden">
@@ -78,7 +79,7 @@ export default async function OrderPage({
           {/* RIGHT PANEL: Specifications, Courier Logistics & Diagnostics */}
           <div className="space-y-6">
             <div className="rounded-[24px] border border-[var(--bdr)] bg-[var(--surf)] p-6 md:p-7 space-y-6 shadow-2xl">
-              
+
               {/* Build Meta specifications block */}
               <div>
                 <div className="text-[10px] font-bold tracking-[0.16em] uppercase text-[var(--t3)] mb-4 border-b border-[var(--bdr)] pb-2" style={{ fontFamily: "var(--ff-d)" }}>

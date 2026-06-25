@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function NewOrderPage() {
+  const router = useRouter();
+  
   // Synchronized exactly with database columns
   const [form, setForm] = useState({
     customer_name: "",
@@ -38,49 +41,45 @@ export default function NewOrderPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    console.log(result);
+      if (!response.ok) {
+        alert(result.error || "Failed to create order.");
+        return;
+      }
 
-    if (!response.ok) {
-      alert(result.error || "Failed to create order.");
-      return;
+      alert("Order created successfully!");
+      router.push("/admin");
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
     }
-
-    alert("Order created successfully!");
-
-    console.log(result.order);
-
-    // Later we'll redirect here
-    // router.push(`/admin/orders/${result.order.order_number}`);
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong.");
-  }
-};
+  };
 
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       <div className="mx-auto max-w-5xl p-8">
-        <h1 className="text-4xl font-bold mb-8">Create New Order</h1>
+        <h1 className="text-4xl font-bold mb-8 font-mono tracking-tight">
+          Create New Order<span className="text-[#d4f700]">.</span>
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          
+
           {/* Customer Information */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Customer Information</h2>
+            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Customer Information</h2>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm text-zinc-400">Customer Name</label>
@@ -88,7 +87,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="customer_name"
                   value={form.customer_name}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
               <div>
@@ -97,7 +96,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="discord_username"
                   value={form.discord_username}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  placeholder="@username"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
               <div>
@@ -107,7 +107,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="customer_email"
                   value={form.customer_email}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
               <div>
@@ -116,7 +116,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="customer_phone"
                   value={form.customer_phone}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
             </div>
@@ -124,7 +124,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Service & Status */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Service & Status Information</h2>
+            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Service & Status Information</h2>
             <div className="grid gap-4 md:grid-cols-3">
               <div>
                 <label className="mb-2 block text-sm text-zinc-400">Service Type</label>
@@ -132,7 +132,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="service_type"
                   value={form.service_type}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition appearance-none"
                 >
                   <option value="Complete Switch Mod">Complete Switch Mod</option>
                   <option value="Switch Lubing">Switch Lubing</option>
@@ -149,7 +149,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="current_status"
                   value={form.current_status}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition appearance-none"
                 >
                   <option value="Order Received">Order Received</option>
                   <option value="Order Confirmed">Order Confirmed</option>
@@ -181,7 +181,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     value={form.estimated_total}
                     onChange={handleChange}
                     placeholder="0"
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 pl-9 text-white focus:outline-none focus:border-purple-500"
+                    className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 pl-9 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                   />
                 </div>
               </div>
@@ -194,14 +194,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                 value={form.order_summary}
                 onChange={handleChange}
                 rows={4}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
               />
             </div>
           </section>
 
           {/* Keyboard */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Keyboard Information</h2>
+            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Keyboard Information</h2>
             <div className="grid gap-4">
               <div>
                 <label className="mb-2 block text-sm text-zinc-400">Keyboard / PCB Model</label>
@@ -209,7 +209,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="keyboard_pcb_model"
                   value={form.keyboard_pcb_model}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
               <div>
@@ -219,7 +219,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   value={form.switch_details}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
             </div>
@@ -227,14 +227,14 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Shipping Address */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Shipping Address</h2>
+            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Shipping Address</h2>
             <div className="grid gap-4">
               <input
                 name="street_address"
                 value={form.street_address}
                 onChange={handleChange}
                 placeholder="Street Address"
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
               />
               <div className="grid gap-4 md:grid-cols-3">
                 <input
@@ -242,21 +242,21 @@ const handleSubmit = async (e: React.FormEvent) => {
                   value={form.city}
                   onChange={handleChange}
                   placeholder="City"
-                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
                 <input
                   name="state"
                   value={form.state}
                   onChange={handleChange}
                   placeholder="State"
-                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
                 <input
                   name="pincode"
                   value={form.pincode}
                   onChange={handleChange}
                   placeholder="Pincode"
-                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
             </div>
@@ -264,7 +264,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Logistics Details */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Logistics Details (Optional)</h2>
+            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Logistics Details (Optional)</h2>
             <div className="grid gap-4 md:grid-cols-3">
               <div>
                 <label className="mb-2 block text-sm text-zinc-400">Courier Partner</label>
@@ -273,7 +273,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   value={form.courier}
                   onChange={handleChange}
                   placeholder="e.g., Delhivery, Bluedart"
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
               <div>
@@ -283,7 +283,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   value={form.tracking_number}
                   onChange={handleChange}
                   placeholder="Tracking ID"
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
                 />
               </div>
               <div>
@@ -293,7 +293,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="estimated_delivery"
                   value={form.estimated_delivery}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500 [color-scheme:dark]"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition [color-scheme:dark]"
                 />
               </div>
             </div>
@@ -301,13 +301,13 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Notes */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold">Additional Notes</h2>
+            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Additional Notes</h2>
             <textarea
               name="notes"
               value={form.notes}
               onChange={handleChange}
               rows={6}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-purple-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
             />
           </section>
 
@@ -315,18 +315,19 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="flex justify-end gap-4">
             <button
               type="button"
-              className="rounded-lg border border-zinc-700 px-6 py-3 text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
+              onClick={() => router.push("/admin")}
+              className="rounded-lg border border-zinc-700 px-6 py-3 text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
             >
               Cancel
             </button>
+
             <button
               type="submit"
-              className="rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700 transition-colors"
+              className="rounded-lg bg-[#d4f700] text-black px-6 py-3 font-bold transition hover:opacity-90 shadow-[0_4px_20px_rgba(212,247,0,0.1)]"
             >
               Create Order
             </button>
           </div>
-
         </form>
       </div>
     </main>
