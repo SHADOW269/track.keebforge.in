@@ -1,26 +1,48 @@
+/* 1. MUST BE FIRST: Remote fonts and utilities */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
+/* 2. Theme tokens and variable configurations */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --black: #060608;
+  --bg: #080a0c;
+  --bg1: #0d0f12;
+  --bg2: #12151a;
+  --bg3: #191d24;
+  --surf: rgba(255,255,255,0.038);
+  --surf-h: rgba(255,255,255,0.065);
+  --bdr: rgba(255,255,255,0.07);
+  --bdr-h: rgba(255,255,255,0.14);
+  --t1: #f0f0f5;
+  --t2: #9a9aa8;
+  --t3: #5a5a68;
+  --acc: #d4f700;
+  --acc-dim: rgba(212,247,0,0.10);
+  --acc-glow: rgba(212,247,0,0.22);
+  --acc-glow2: rgba(212,247,0,0.06);
+  
+  --ff-d: 'Syne', sans-serif;
+  --ff-b: 'Outfit', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* 3. Global structural elements */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--t1);
+  font-family: var(--ff-b);
+}
+
+/* Custom Scrollbar Utilities */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bdr-h);
 }
