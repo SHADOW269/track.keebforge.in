@@ -213,7 +213,7 @@ export default function NewOrderPage() {
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm text-zinc-400">Switch Details</label>
+                <label className="mb-2 block text-sm text-zinc-400">Details</label>
                 <textarea
                   name="switch_details"
                   value={form.switch_details}

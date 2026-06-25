@@ -39,10 +39,24 @@ interface TimelineItem {
 }
 
 const STATUS_OPTIONS = [
-    "Order Received", "Payment Pending", "Payment Received", "Parts Booked",
-    "Parts Received", "In Queue", "Work Started", "Testing", "Completed",
-    "Packing", "Shipment Booked", "Shipment Picked Up", "Shipping",
-    "Delivered", "Warranty Active", "Warranty Closed"
+    "Order Received",
+    "Order Confirmed",
+    "Payment Pending",
+    "Payment Received",
+    "Parts Booked",
+    "Parts Shipped",
+    "Parts Received",
+    "In Queue",
+    "Work Started",
+    "Testing",
+    "Completed",
+    "Packing",
+    "Shipment Booked",
+    "Shipment Picked Up",
+    "In Transit",
+    "Delivered",
+    "Testing Warranty Active",
+    "Order Completed",
 ];
 
 const SERVICE_OPTIONS = [
