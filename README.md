@@ -116,51 +116,51 @@ Database
 ```
 track-keebforge/
 │
-├── middleware.ts
-├── package.json
-├── README.md
-├── next.config.ts
-├── tsconfig.json
-├── .env.local
-├── public/
+├── middleware.ts                 # Protects admin routes (authentication & authorization)
+├── package.json                  # Project dependencies and npm scripts
+├── README.md                     # Project documentation
+├── next.config.ts                # Next.js configuration
+├── tsconfig.json                 # TypeScript configuration
+├── .env.local                    # Environment variables (Supabase, API keys, etc.)
+├── public/                       # Static assets (images, icons, robots.txt, etc.)
 │
 └── src/
-    ├── app/
-    │   ├── admin/
-    │   │   ├── page.tsx                  # Dashboard
+    ├── app/                      # Next.js App Router
+    │   ├── admin/                # Internal admin dashboard
+    │   │   ├── page.tsx          # Dashboard (order statistics & recent orders)
     │   │   ├── new/
-    │   │   │   └── page.tsx
+    │   │   │   └── page.tsx      # Create a new customer order
     │   │   └── orders/
     │   │       └── [orderNumber]/
-    │   │           └── page.tsx
+    │   │           └── page.tsx  # View & edit a specific order
     │   │
-    │   ├── api/
+    │   ├── api/                  # Backend API routes
     │   │   └── orders/
-    │   │       ├── route.ts
+    │   │       ├── route.ts      # GET all orders / POST create new order
     │   │       └── [id]/
-    │   │           └── route.ts
+    │   │           └── route.ts  # GET single order / PATCH update / DELETE archive
     │   │
     │   ├── login/
-    │   │   └── page.tsx
+    │   │   └── page.tsx          # Admin login page
     │   │
     │   ├── track/
     │   │   └── [orderNumber]/
-    │   │       └── page.tsx
+    │   │       └── page.tsx      # Public customer order tracking page
     │   │
-    │   ├── favicon.ico
-    │   ├── globals.css
-    │   ├── layout.tsx
-    │   └── page.tsx
+    │   ├── favicon.ico           # Website favicon
+    │   ├── globals.css           # Global styles
+    │   ├── layout.tsx            # Root application layout
+    │   └── page.tsx              # Landing / Home page
     │
-    ├── components/
-    │   └── OrderTimeline.tsx
+    ├── components/               # Reusable React components
+    │   └── OrderTimeline.tsx     # Customer order progress timeline component
     │
-    ├── constants/
-    │   └── order-statuses.ts
+    ├── constants/                # Shared constants used across the app
+    │   └── order-statuses.ts     # Master list of all valid order statuses
     │
-    └── lib/
-        ├── supabase.ts
-        └── supabaseAdmin.ts
+    └── lib/                      # Shared utilities & external service clients
+        ├── supabase.ts           # Public Supabase client (read operations)
+        └── supabaseAdmin.ts      # Service-role Supabase client (admin CRUD operations)
 ```
 
 ---
