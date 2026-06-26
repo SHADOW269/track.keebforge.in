@@ -119,36 +119,48 @@ track-keebforge/
 ├── middleware.ts
 ├── package.json
 ├── README.md
+├── next.config.ts
+├── tsconfig.json
+├── .env.local
+├── public/
 │
-├── src/
-│
-│   ├── app/
-│   │
-│   ├── admin/
-│   │
-│   │   ├── page.tsx
-│   │   ├── new/
-│   │   └── orders/
-│   │       └── [orderNumber]
-│   │
-│   ├── api/
-│   │
-│   ├── login/
-│   │
-│   ├── track/
-│   │
-│   ├── layout.tsx
-│   └── globals.css
-│
-│
-├── components/
-│
-├── lib/
-│   ├── supabase.ts
-│   ├── supabaseAdmin.ts
-│   └── auth/
-│
-└── types/
+└── src/
+    ├── app/
+    │   ├── admin/
+    │   │   ├── page.tsx                  # Dashboard
+    │   │   ├── new/
+    │   │   │   └── page.tsx
+    │   │   └── orders/
+    │   │       └── [orderNumber]/
+    │   │           └── page.tsx
+    │   │
+    │   ├── api/
+    │   │   └── orders/
+    │   │       ├── route.ts
+    │   │       └── [id]/
+    │   │           └── route.ts
+    │   │
+    │   ├── login/
+    │   │   └── page.tsx
+    │   │
+    │   ├── track/
+    │   │   └── [orderNumber]/
+    │   │       └── page.tsx
+    │   │
+    │   ├── favicon.ico
+    │   ├── globals.css
+    │   ├── layout.tsx
+    │   └── page.tsx
+    │
+    ├── components/
+    │   └── OrderTimeline.tsx
+    │
+    ├── constants/
+    │   └── order-statuses.ts
+    │
+    └── lib/
+        ├── supabase.ts
+        └── supabaseAdmin.ts
 ```
 
 ---
