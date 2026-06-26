@@ -2,40 +2,38 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ORDER_STATUSES, SERVICE_TYPES } from "@/constants/order-statuses";
+
+const INITIAL_FORM = {
+  customer_name: "",
+  customer_email: "",
+  customer_phone: "",
+  discord_username: "",
+  service_type: SERVICE_TYPES[0],
+  current_status: ORDER_STATUSES[0],
+  order_summary: "",
+  estimated_total: "",
+  keyboard_pcb_model: "",
+  switch_details: "",
+  street_address: "",
+  city: "",
+  state: "",
+  pincode: "",
+  courier: "",
+  tracking_number: "",
+  estimated_delivery: "",
+  notes: "",
+};
 
 export default function NewOrderPage() {
   const router = useRouter();
-  
-  // Synchronized exactly with database columns
-  const [form, setForm] = useState({
-    customer_name: "",
-    customer_email: "",
-    customer_phone: "",
-    discord_username: "",
-
-    service_type: "Complete Switch Mod",
-    current_status: "Order Received",
-
-    order_summary: "",
-    estimated_total: "",
-
-    keyboard_pcb_model: "",
-    switch_details: "",
-
-    street_address: "",
-    city: "",
-    state: "",
-    pincode: "",
-
-    courier: "",
-    tracking_number: "",
-    estimated_delivery: "",
-
-    notes: "",
-  });
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -43,13 +41,12 @@ export default function NewOrderPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
 
     try {
       const response = await fetch("/api/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
@@ -60,11 +57,12 @@ export default function NewOrderPage() {
         return;
       }
 
-      alert("Order created successfully!");
       router.push("/admin");
     } catch (err) {
-      console.error(err);
+      console.error("[NewOrderPage]", err);
       alert("Something went wrong.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -79,162 +77,150 @@ export default function NewOrderPage() {
 
           {/* Customer Information */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Customer Information</h2>
+            <h2 className="mb-6 text-xl font-semibold text-zinc-200">
+              Customer Information
+            </h2>
             <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Customer Name</label>
+              <Field label="Customer Name">
                 <input
                   name="customer_name"
                   value={form.customer_name}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  className={inputClass}
                 />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Discord Username</label>
+              </Field>
+              <Field label="Discord Username">
                 <input
                   name="discord_username"
                   value={form.discord_username}
                   onChange={handleChange}
                   placeholder="@username"
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  className={inputClass}
                 />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Email</label>
+              </Field>
+              <Field label="Email">
                 <input
                   type="email"
                   name="customer_email"
                   value={form.customer_email}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  className={inputClass}
                 />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Phone / WhatsApp</label>
+              </Field>
+              <Field label="Phone / WhatsApp">
                 <input
                   name="customer_phone"
                   value={form.customer_phone}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  className={inputClass}
                 />
-              </div>
+              </Field>
             </div>
           </section>
 
           {/* Service & Status */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Service & Status Information</h2>
+            <h2 className="mb-6 text-xl font-semibold text-zinc-200">
+              Service & Status
+            </h2>
             <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Service Type</label>
+              <Field label="Service Type">
                 <select
                   name="service_type"
                   value={form.service_type}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition appearance-none"
+                  className={selectClass}
                 >
-                  <option value="Complete Switch Mod">Complete Switch Mod</option>
-                  <option value="Switch Lubing">Switch Lubing</option>
-                  <option value="Stabilizer Tuning">Stabilizer Tuning</option>
-                  <option value="Build Service">Build Service</option>
-                  <option value="Repair">Repair</option>
-                  <option value="Custom">Custom</option>
+                  {SERVICE_TYPES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
                 </select>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Current Status</label>
+              </Field>
+              <Field label="Current Status">
                 <select
                   name="current_status"
                   value={form.current_status}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition appearance-none"
+                  className={selectClass}
                 >
-                  <option value="Order Received">Order Received</option>
-                  <option value="Order Confirmed">Order Confirmed</option>
-                  <option value="Payment Pending">Payment Pending</option>
-                  <option value="Payment Received">Payment Received</option>
-                  <option value="Parts Booked">Parts Booked</option>
-                  <option value="Parts Shipped">Parts Shipped</option>
-                  <option value="Parts Received">Parts Received</option>
-                  <option value="In Queue">In Queue</option>
-                  <option value="Work Started">Work Started</option>
-                  <option value="Testing">Testing</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Packing">Packing</option>
-                  <option value="Shipment Booked">Shipment Booked</option>
-                  <option value="Shipment Picked Up">Shipment Picked Up</option>
-                  <option value="Shipping">Shipping</option>
-                  <option value="Warranty Active">Warranty Active</option>
-                  <option value="Warranty Closed">Warranty Closed</option>
+                  {ORDER_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
                 </select>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Estimated Total</label>
+              </Field>
+              <Field label="Estimated Total">
                 <div className="relative flex items-center">
-                  <span className="absolute left-4 text-zinc-400 select-none">₹</span>
+                  <span className="absolute left-4 text-zinc-400 select-none">
+                    ₹
+                  </span>
                   <input
                     type="number"
                     name="estimated_total"
                     value={form.estimated_total}
                     onChange={handleChange}
                     placeholder="0"
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 pl-9 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                    className={`${inputClass} pl-9`}
                   />
                 </div>
-              </div>
+              </Field>
             </div>
-
             <div className="mt-4">
-              <label className="mb-2 block text-sm text-zinc-400">Order Summary</label>
-              <textarea
-                name="order_summary"
-                value={form.order_summary}
-                onChange={handleChange}
-                rows={4}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
-              />
+              <Field label="Order Summary">
+                <textarea
+                  name="order_summary"
+                  value={form.order_summary}
+                  onChange={handleChange}
+                  rows={4}
+                  className={textareaClass}
+                />
+              </Field>
             </div>
           </section>
 
           {/* Keyboard */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Keyboard Information</h2>
-            <div className="grid gap-4">
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Keyboard / PCB Model</label>
+            <h2 className="mb-6 text-xl font-semibold text-zinc-200">
+              Keyboard Information
+            </h2>
+            <div className="space-y-4">
+              <Field label="Keyboard / PCB Model">
                 <input
                   name="keyboard_pcb_model"
                   value={form.keyboard_pcb_model}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  placeholder="e.g. Mode Sonnet, Tiger80 Lite"
+                  className={inputClass}
                 />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Details</label>
+              </Field>
+              <Field label="Switch & Build Details">
                 <textarea
                   name="switch_details"
                   value={form.switch_details}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  placeholder="Switches, spring weights, lubricant used..."
+                  className={textareaClass}
                 />
-              </div>
+              </Field>
             </div>
           </section>
 
-          {/* Shipping Address */}
+          {/* Shipping */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Shipping Address</h2>
-            <div className="grid gap-4">
+            <h2 className="mb-6 text-xl font-semibold text-zinc-200">
+              Shipping Address
+            </h2>
+            <div className="space-y-4">
               <input
                 name="street_address"
                 value={form.street_address}
                 onChange={handleChange}
                 placeholder="Street Address"
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                className={inputClass}
               />
               <div className="grid gap-4 md:grid-cols-3">
                 <input
@@ -242,76 +228,81 @@ export default function NewOrderPage() {
                   value={form.city}
                   onChange={handleChange}
                   placeholder="City"
-                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  className={inputClass}
                 />
                 <input
                   name="state"
                   value={form.state}
                   onChange={handleChange}
                   placeholder="State"
-                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  className={inputClass}
                 />
                 <input
                   name="pincode"
                   value={form.pincode}
                   onChange={handleChange}
                   placeholder="Pincode"
-                  className="rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  className={`${inputClass} font-mono`}
                 />
               </div>
             </div>
           </section>
 
-          {/* Logistics Details */}
+          {/* Logistics */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Logistics Details (Optional)</h2>
+            <h2 className="mb-6 text-xl font-semibold text-zinc-200">
+              Logistics{" "}
+              <span className="text-zinc-500 font-normal text-sm">
+                (optional)
+              </span>
+            </h2>
             <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Courier Partner</label>
+              <Field label="Courier Partner">
                 <input
                   name="courier"
                   value={form.courier}
                   onChange={handleChange}
-                  placeholder="e.g., Delhivery, Bluedart"
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  placeholder="e.g. Delhivery, Bluedart"
+                  className={inputClass}
                 />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Tracking Number</label>
+              </Field>
+              <Field label="Tracking Number">
                 <input
                   name="tracking_number"
                   value={form.tracking_number}
                   onChange={handleChange}
-                  placeholder="Tracking ID"
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+                  placeholder="AWB Number"
+                  className={`${inputClass} font-mono`}
                 />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm text-zinc-400">Estimated Delivery</label>
+              </Field>
+              <Field label="Estimated Delivery">
                 <input
                   type="date"
                   name="estimated_delivery"
                   value={form.estimated_delivery}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition [color-scheme:dark]"
+                  className={`${inputClass} [color-scheme:dark]`}
                 />
-              </div>
+              </Field>
             </div>
           </section>
 
           {/* Notes */}
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-            <h2 className="mb-6 text-2xl font-semibold text-zinc-200">Additional Notes</h2>
+            <h2 className="mb-6 text-xl font-semibold text-zinc-200">
+              Internal Notes
+            </h2>
             <textarea
               name="notes"
               value={form.notes}
               onChange={handleChange}
-              rows={6}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition"
+              rows={5}
+              placeholder="Private build notes, reminders..."
+              className={textareaClass}
             />
           </section>
 
-          {/* Form Actions */}
+          {/* Actions */}
           <div className="flex justify-end gap-4">
             <button
               type="button"
@@ -320,12 +311,12 @@ export default function NewOrderPage() {
             >
               Cancel
             </button>
-
             <button
               type="submit"
-              className="rounded-lg bg-[#d4f700] text-black px-6 py-3 font-bold transition hover:opacity-90 shadow-[0_4px_20px_rgba(212,247,0,0.1)]"
+              disabled={submitting}
+              className="rounded-lg bg-[#d4f700] text-black px-6 py-3 font-bold transition hover:opacity-90 disabled:opacity-50"
             >
-              Create Order
+              {submitting ? "Creating..." : "Create Order"}
             </button>
           </div>
         </form>
@@ -333,3 +324,27 @@ export default function NewOrderPage() {
     </main>
   );
 }
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="mb-2 block text-sm text-zinc-400">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const inputClass =
+  "w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition";
+
+const selectClass =
+  "w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition appearance-none";
+
+const textareaClass =
+  "w-full rounded-lg border border-zinc-700 bg-zinc-800 p-3 text-white focus:outline-none focus:border-[#d4f700]/60 transition resize-none";

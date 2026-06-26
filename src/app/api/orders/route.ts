@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-console.log(
-  "Using service role key:",
-  process.env.SUPABASE_SERVICE_ROLE_KEY?.startsWith("sb_secret_")
-);
-
 export async function POST(request: Request) {
-  console.log("🚀 POST /api/orders called");
-
   try {
     const body = await request.json();
 
@@ -58,8 +51,6 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    console.log("Supabase error:", error);
-
     if (error) {
       return NextResponse.json(
         { success: false, error: error.message },
@@ -67,13 +58,9 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      order: data,
-    });
+    return NextResponse.json({ success: true, order: data });
   } catch (err) {
-    console.error(err);
-
+    console.error("[POST /api/orders]", err);
     return NextResponse.json(
       { success: false, error: "Something went wrong." },
       { status: 500 }

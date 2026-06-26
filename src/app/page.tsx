@@ -3,209 +3,239 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+const NAV_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "#about" },
+  { label: "Services", href: "#services" },
+  { label: "Contact", href: "mailto:contact@keebforge.in" },
+];
+
+// Simulated live order activity for the terminal animation
+const TERMINAL_LINES = [
+  { prefix: "→", text: "KF000041  Work Started", color: "text-[var(--acc)]" },
+  { prefix: "✓", text: "KF000038  Delivered", color: "text-emerald-400" },
+  { prefix: "→", text: "KF000045  Parts Received", color: "text-[var(--acc)]" },
+  { prefix: "·", text: "KF000040  In Transit", color: "text-[var(--t2)]" },
+  { prefix: "→", text: "KF000043  Testing", color: "text-[var(--acc)]" },
+  { prefix: "✓", text: "KF000036  Order Completed", color: "text-emerald-400" },
+  { prefix: "·", text: "KF000047  Order Received", color: "text-[var(--t2)]" },
+  { prefix: "→", text: "KF000044  Packing", color: "text-[var(--acc)]" },
+];
+
 export default function Home() {
   const [orderNumber, setOrderNumber] = useState("");
-  const [showThankYou, setShowThankYou] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [visibleLines, setVisibleLines] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("success") === "true") {
-        setShowThankYou(true);
-      }
-    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "true") setShowSuccess(true);
   }, []);
+
+  // Stagger terminal lines appearing
+  useEffect(() => {
+    if (visibleLines >= TERMINAL_LINES.length) return;
+    const timer = setTimeout(
+      () => setVisibleLines((v) => v + 1),
+      visibleLines === 0 ? 600 : 280
+    );
+    return () => clearTimeout(timer);
+  }, [visibleLines]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanOrderNumber = orderNumber.trim();
-    if (!cleanOrderNumber) return;
-    router.push(`/track/${cleanOrderNumber.toUpperCase()}`);
+    const clean = orderNumber.trim().toUpperCase();
+    if (!clean) return;
+    router.push(`/track/${clean}`);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b0c10] text-[#f0f0f5] relative overflow-hidden font-sans">
-      
-      {/* ─── IMAGE_DA4D0A.JPG EXACT CSS LAYERS ─── */}
-      <style jsx global>{`
-        @keyframes subtleGlobeRotation {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes livePulse {
-          0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 12px #d4f700, 0 0 24px #d4f700; }
-          50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 28px #d4f700, 0 0 45px #d4f700; }
-        }
-        .globe-horizon-mask {
-          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0.8) 65%, rgba(0,0,0,0) 95%);
-          -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0.8) 65%, rgba(0,0,0,0) 95%);
-        }
-      `}</style>
+    <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--t1)] relative overflow-hidden">
 
-      {/* ─── BACKGROUND STARSCAPE FIELD ─── */}
-      <div className="absolute inset-0 pointer-events-none opacity-40 z-0">
-        <div className="absolute w-[1px] h-[1px] bg-white rounded-full top-[12%] left-[10%]" />
-        <div className="absolute w-[2px] h-[2px] bg-white rounded-full top-[8%] left-[38%] opacity-80" />
-        <div className="absolute w-[1px] h-[1px] bg-white rounded-full top-[15%] left-[66%]" />
-        <div className="absolute w-[2px] h-[2px] bg-white rounded-full top-[5%] left-[88%] opacity-90" />
-        <div className="absolute w-[1px] h-[1px] bg-white rounded-full top-[32%] left-[15%]" />
-        <div className="absolute w-[1px] h-[1px] bg-white rounded-full top-[28%] left-[92%]" />
-        <div className="absolute w-[2px] h-[2px] bg-white rounded-full top-[42%] left-[5%] opacity-50" />
-      </div>
+      {/* Moving dot-grid background */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          animation: "gridDrift 8s linear infinite",
+        }}
+      />
 
-      {/* ─── TOP HEADER NAVIGATION ─── */}
-      <nav className="w-full h-20 border-b border-white/[0.06] bg-[#0b0c10]/40 backdrop-blur-md z-50 flex items-center">
+      {/* Top accent glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-[var(--acc)] opacity-20 blur-sm pointer-events-none z-0" />
+
+      {/* ─── Nav ─── */}
+      <nav className="w-full h-16 border-b border-[var(--bdr)] bg-[var(--bg)]/80 backdrop-blur-md z-50 flex items-center">
         <div className="max-w-7xl mx-auto w-full px-6 flex items-center justify-between">
-          <a href="/" className="text-sm font-bold tracking-wider text-white uppercase font-mono">
-            KeebForge<span className="text-[#d4f700]">.</span>in
+          <a
+            href="/"
+            className="text-sm font-bold tracking-wider text-[var(--t1)] uppercase"
+            style={{ fontFamily: "var(--ff-d)" }}
+          >
+            KeebForge<span className="text-[var(--acc)]">.</span>in
           </a>
-          
-          <div className="hidden md:flex items-center gap-10 text-[11px] font-medium tracking-[0.18em] uppercase text-[#9a9aa8]">
-            <a href="/" className="text-white hover:text-[#d4f700] transition-colors">Home</a>
-            <a href="#about" className="hover:text-[#d4f700] transition-colors">About Us</a>
-            <a href="#services" className="hover:text-[#d4f700] transition-colors">Our Services</a>
-            <a href="mailto:contact@keebforge.in" className="hover:text-[#d4f700] transition-colors">Contact</a>
+
+          <div className="hidden md:flex items-center gap-8 text-[11px] font-medium tracking-[0.16em] uppercase text-[var(--t3)]">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="hover:text-[var(--acc)] transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
 
-          <button 
-            onClick={() => document.getElementById("tracking-input")?.focus()}
-            className="text-[10px] font-bold tracking-[0.15em] uppercase border border-[#d4f700]/40 text-[#d4f700] px-4 py-2 rounded hover:bg-[#d4f700] hover:text-black transition-all duration-300"
+          <button
+            onClick={() => document.getElementById("order-input")?.focus()}
+            className="text-[10px] font-bold tracking-[0.15em] uppercase border border-[var(--acc)]/40 text-[var(--acc)] px-4 py-2 rounded hover:bg-[var(--acc)] hover:text-black transition-all duration-200"
           >
             Track Order
           </button>
         </div>
       </nav>
 
-      {/* ─── HERO INTERACTIVE WORKSPACE GRID ─── */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-8 relative z-10">
-        
-        {/* LEFT COLUMN: THE ACCURATE GLOBE VISUAL FROM IMAGE_DA4D0A.JPG */}
-        <div className="lg:col-span-6 flex items-center justify-center relative min-h-[420px] lg:min-h-[520px] overflow-visible">
-          
-          {/* Main Massive Earth Sphere Container */}
-          <div className="absolute top-12 lg:top-24 w-[460px] sm:w-[560px] lg:w-[680px] h-[460px] sm:h-[560px] lg:h-[680px] rounded-full border border-white/[0.08] bg-gradient-to-b from-[#161920] via-[#090a0d] to-[#0b0c10] shadow-[0_0_120px_rgba(255,255,255,0.02)] overflow-hidden globe-horizon-mask">
-            
-            {/* Outward White-Glow Atmosphere Halo Ring */}
-            <div className="absolute inset-0 rounded-full border-[5px] border-white/[0.04] blur-[3px] pointer-events-none" />
-            <div className="absolute inset-0 rounded-full border border-white/20 pointer-events-none opacity-90 shadow-[0_0_40px_rgba(255,255,255,0.15)_inset]" />
+      {/* ─── Hero ─── */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16 relative z-10">
 
-            {/* Concentric Outer Halo Shading */}
-            <div className="absolute -inset-4 rounded-full bg-gradient-to-b from-white/[0.03] to-transparent blur-xl pointer-events-none" />
+        {/* Left — Terminal panel */}
+        <div className="animate-fade-up order-2 lg:order-1">
+          <div className="rounded-2xl border border-[var(--bdr)] bg-[var(--bg1)] overflow-hidden shadow-2xl">
 
-            {/* Dynamic Dot Grid Matrix Texture */}
-            <div 
-              className="absolute inset-[-40px] opacity-[0.35] pointer-events-none bg-[radial-gradient(rgba(255,255,255,0.6)_1px,transparent_1px)] bg-[size:11px_11px]"
-              style={{ animation: "subtleGlobeRotation 180s linear infinite" }}
-            />
-
-            {/* ─── HOTSPOT LOCATIONS ALONG THE HORIZON ─── */}
-            {/* Big Main Core Hotspot (Lower Center) */}
-            <div className="absolute top-[46%] left-[45%] z-20">
-              <div className="w-5 h-5 rounded-full bg-[#d4f700] shadow-[0_0_25px_#d4f700] animate-[livePulse_1.8s_infinite_ease-in-out]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-black absolute inset-0 m-auto shadow-[0_0_2px_black]" />
+            {/* Window chrome */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--bdr)] bg-[var(--bg2)]">
+              <span className="w-3 h-3 rounded-full bg-red-500/70" />
+              <span className="w-3 h-3 rounded-full bg-yellow-500/70" />
+              <span className="w-3 h-3 rounded-full bg-emerald-500/70" />
+              <span
+                className="ml-3 text-[10px] tracking-widest uppercase text-[var(--t3)]"
+                style={{ fontFamily: "var(--ff-d)" }}
+              >
+                keebforge — live order feed
+              </span>
+              <span className="ml-auto flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--acc)] animate-[glowPulse_2s_infinite]" />
+                <span className="text-[9px] text-[var(--acc)] tracking-widest uppercase font-mono">
+                  live
+                </span>
+              </span>
             </div>
 
-            {/* Left Wing Node 1 */}
-            <div className="absolute top-[34%] left-[24%] z-20">
-              <div className="w-3.5 h-3.5 rounded-full bg-[#d4f700] shadow-[0_0_15px_#d4f700] opacity-90 animate-[livePulse_2.2s_infinite_ease-in-out]" />
-              <div className="w-1 h-1 rounded-full bg-black absolute inset-0 m-auto" />
+            {/* Terminal body */}
+            <div className="p-5 space-y-2.5 min-h-[280px] font-mono text-xs">
+              <div className="text-[var(--t3)] text-[10px] mb-4 tracking-wider">
+                $ tail -f orders.log
+              </div>
+
+              {TERMINAL_LINES.map((line, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center gap-3 transition-all duration-300 ${
+                    i < visibleLines
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-1"
+                  }`}
+                  style={{ transitionDelay: `${i * 20}ms` }}
+                >
+                  <span className={`${line.color} w-3 shrink-0`}>
+                    {line.prefix}
+                  </span>
+                  <span className="text-[var(--t2)]">{line.text}</span>
+                </div>
+              ))}
+
+              {visibleLines >= TERMINAL_LINES.length && (
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-[var(--t3)]">$</span>
+                  <span className="text-[var(--t2)] terminal-cursor" />
+                </div>
+              )}
             </div>
 
-            {/* Left Wing Node 2 */}
-            <div className="absolute top-[48%] left-[19%] z-20">
-              <div className="w-3 h-3 rounded-full bg-[#d4f700] shadow-[0_0_12px_#d4f700] opacity-75" />
-              <div className="w-0.5 h-0.5 rounded-full bg-black absolute inset-0 m-auto" />
+            {/* Footer strip */}
+            <div className="border-t border-[var(--bdr)] px-5 py-2.5 flex items-center justify-between">
+              <span className="text-[9px] text-[var(--t3)] tracking-widest uppercase font-mono">
+                {TERMINAL_LINES.length} active orders
+              </span>
+              <span className="text-[9px] text-[var(--t3)] font-mono">
+                KeebForge Node · MK.01
+              </span>
             </div>
-
-            {/* Right Wing Node 1 */}
-            <div className="absolute top-[35%] left-[70%] z-20">
-              <div className="w-3.5 h-3.5 rounded-full bg-[#d4f700] shadow-[0_0_15px_#d4f700] opacity-90 animate-[livePulse_2.5s_infinite_ease-in-out]" />
-              <div className="w-1 h-1 rounded-full bg-black absolute inset-0 m-auto" />
-            </div>
-
-            {/* Right Wing Node 2 */}
-            <div className="absolute top-[42%] left-[81%] z-20">
-              <div className="w-3 h-3 rounded-full bg-[#d4f700] shadow-[0_0_12px_#d4f700] opacity-80" />
-            </div>
-
-            {/* Deep Southern Node */}
-            <div className="absolute top-[58%] left-[58%] z-20">
-              <div className="w-3 h-3 rounded-full bg-[#d4f700] shadow-[0_0_12px_#d4f700] opacity-70" />
-            </div>
-
-            {/* Deep Eastern Node */}
-            <div className="absolute top-[54%] left-[80%] z-20">
-              <div className="w-2 h-2 rounded-full bg-[#d4f700] opacity-50" />
-            </div>
-
-          </div>
-
-          {/* Micro HUD Metadata Badge */}
-          <div className="absolute bottom-2 lg:bottom-10 z-30 text-[9px] font-mono tracking-[0.25em] text-[#5a5a68] uppercase bg-[#0b0c10]/95 px-4 py-1.5 border border-white/[0.06] rounded shadow-2xl backdrop-blur-md">
-            Logistics Orbit Active
           </div>
         </div>
 
-        {/* RIGHT COLUMN: SEARCH INTERACTION ENGINE */}
-        <div className="lg:col-span-6 space-y-6 lg:pl-6 z-20">
-          
-          {/* Optional Post-Checkout Success Banner */}
-          {showThankYou && (
-            <div 
-              className="rounded-xl border border-[#d4f700]/30 bg-[#d4f700]/5 p-4 max-w-xl animate-[fadeIn_0.3s_ease-out_both] shadow-[0_0_15px_rgba(212,247,0,0.05)]"
-            >
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#d4f700] flex items-center gap-2 font-mono">
-                <span>⚡</span> Order Identity Initialized
-              </h3>
-              <p className="text-xs text-[#9a9aa8] mt-1 leading-relaxed">
-                Your build records are synced into the node mesh. Pass your tracking sequence key code below to begin diagnostics pipeline tracing.
+        {/* Right — Search */}
+        <div className="space-y-7 order-1 lg:order-2">
+
+          {showSuccess && (
+            <div className="animate-fade-up rounded-xl border border-[var(--acc)]/30 bg-[var(--acc-glow2)] p-4">
+              <p
+                className="text-xs font-bold uppercase tracking-wider text-[var(--acc)] mb-1"
+                style={{ fontFamily: "var(--ff-d)" }}
+              >
+                Order placed
+              </p>
+              <p className="text-xs text-[var(--t2)] leading-relaxed">
+                Your order is confirmed. Use the number from your confirmation
+                email below to follow its progress.
               </p>
             </div>
           )}
 
-          {/* Typography Directives */}
-          <div className="space-y-4">
-            <h2 className="text-xs font-bold tracking-[0.25em] uppercase text-[#d4f700] font-mono">
-              Fulfillment Search Engine
-            </h2>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] uppercase text-white font-mono">
-              Enter Your Docket / AWB / <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9a9aa8] to-[#5a5a68]">
-                Shipment Serial No.
-              </span>
+          <div className="animate-fade-up-delay-1 space-y-3">
+            <p
+              className="text-[10px] font-bold tracking-[0.25em] uppercase text-[var(--acc)]"
+              style={{ fontFamily: "var(--ff-d)" }}
+            >
+              Order Tracking
+            </p>
+            <h1
+              className="text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.05] text-[var(--t1)]"
+              style={{ fontFamily: "var(--ff-d)" }}
+            >
+              Where is
+              <br />
+              your build?
             </h1>
+            <p className="text-sm text-[var(--t2)] leading-relaxed max-w-sm">
+              Enter your order number to see real-time progress on your
+              keyboard build, switch mod, or repair.
+            </p>
           </div>
 
-          {/* Inline Form Bar Component Layout */}
-          <form onSubmit={handleSubmit} className="w-full max-w-xl flex flex-col sm:flex-row items-stretch gap-2 pt-2">
-            <div className="flex-1 relative flex items-center bg-[#12151a] border border-white/[0.08] rounded-xl px-4 transition-all focus-within:border-[#d4f700]/50">
-              <span className="text-sm select-none mr-3 opacity-30">🔎</span>
+          <form
+            onSubmit={handleSubmit}
+            className="animate-fade-up-delay-2 flex flex-col sm:flex-row gap-2 max-w-md"
+          >
+            <div className="flex-1 flex items-center bg-[var(--bg2)] border border-[var(--bdr)] rounded-xl px-4 focus-within:border-[var(--acc)]/50 transition-colors">
               <input
-                id="tracking-input"
+                id="order-input"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="PROMPT MATRIX CODE — E.G. KF-2601"
-                className="w-full bg-transparent py-4.5 text-xs font-bold tracking-widest text-white outline-none placeholder-[#5a5a68] uppercase font-mono"
+                placeholder="e.g. KF000042"
+                className="w-full bg-transparent py-4 text-sm font-mono text-[var(--t1)] outline-none placeholder-[var(--t3)] uppercase tracking-widest"
               />
             </div>
-            
             <button
               type="submit"
-              className="font-bold text-[11px] uppercase tracking-widest text-black px-9 py-4.5 rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap bg-[#d4f700] font-mono hover:brightness-110 active:scale-[0.99]"
-              style={{ boxShadow: "0 4px 20px rgba(212, 247, 0, 0.15)" }}
+              className="font-bold text-xs uppercase tracking-widest text-black px-8 py-4 rounded-xl bg-[var(--acc)] hover:brightness-110 active:scale-[0.98] transition-all duration-150 whitespace-nowrap"
+              style={{ boxShadow: "0 4px 20px var(--acc-glow2)" }}
             >
-              Track Now
+              Track
             </button>
           </form>
 
-          {/* Footer Footprint Guidance Text */}
-          <p className="text-xs text-[#5a5a68] leading-relaxed max-w-md font-medium">
-            Your tracking identification array can be uncovered near the top header of the confirmation sheet delivered right to your electronic mail container.
+          <p className="animate-fade-up-delay-3 text-[11px] text-[var(--t3)] leading-relaxed max-w-xs">
+            Your order number is at the top of the confirmation email we sent
+            you. It starts with{" "}
+            <span className="font-mono text-[var(--t2)]">KF</span>.
           </p>
         </div>
       </main>
-
     </div>
   );
 }
